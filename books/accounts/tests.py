@@ -1,11 +1,12 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 
+
 # Create your tests here.
 class CustomUserTests(TestCase):
     def test_create_user(self):
-        User = get_user_model()
-        user = User.objects.create(
+        user_model = get_user_model()
+        user = user_model.objects.create(
             username='testUserName', 
             email='test@email.com', 
             password='Q1w2e3r4'
@@ -18,8 +19,8 @@ class CustomUserTests(TestCase):
         self.assertFalse(user.is_superuser)
     
     def test_create_superuser(self):
-        User = get_user_model()
-        admin_user = User.objects.create_superuser(
+        user_model = get_user_model()
+        admin_user = user_model.objects.create_superuser(
             username='superadmin',
             email= 'superadmin@email.com',
             password = 'Q1w2e3r4'

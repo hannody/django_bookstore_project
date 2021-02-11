@@ -26,7 +26,7 @@ with open('./config/secrets.key') as secret_key:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1','0.0.0.0']
 
 
 # Application definition
@@ -129,3 +129,5 @@ STATIC_URL = '/static/'
 
 # This will cause our project to use CustomUser instead of the default User model.
 AUTH_USER_MODEL = 'accounts.CustomUser'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'

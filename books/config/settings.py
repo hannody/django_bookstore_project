@@ -39,15 +39,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    #Error: Site doesn't declare an explicit app_label and isn't in an application in INSTALLED_APPS.
+    #https://stackoverflow.com/questions/35388637/runtimeerror-model-class-django-contrib-sites-models-site-doesnt-declare-an-ex
+    #FIX
+    'django.contrib.sites',
+
     # Third party
     'crispy_forms',
+    'allauth',
+    'allauth.account',
     
     # Local
     'accounts',
     'pages',
 ]
-
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -141,5 +146,26 @@ STATICFILES_FINDERS =[
 
 # This will cause our project to use CustomUser instead of the default User model.
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
 LOGIN_REDIRECT_URL = 'home'
+
 LOGOUT_REDIRECT_URL = 'home'
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# django-allauth config
+SITE_ID = 1
+AUTHENTICATION_BACKENDS=(
+    'django.contrib.auth.backends.ModelBackend',
+'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+
+# django-allauth will send such an email upon a successful user registration, which we can and
+# will customize later, but since we don’t yet have a SMTP server properly configured, it will result
+# in an error.
+# The solution, for now, is to have Django output any emails to the command line console instead.
+# Thus we can override the default, implicit config by using console instead of smtp .
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+

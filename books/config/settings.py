@@ -170,3 +170,7 @@ AUTHENTICATION_BACKENDS = (
 # The solution, for now, is to have Django output any emails to the command line console instead.
 # Thus we can override the default, implicit config by using console instead of smtp .
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+
+MEDIA_URL = '/media/' # new
+MEDIA_ROOT = str(BASE_DIR.joinpath('media')) # new

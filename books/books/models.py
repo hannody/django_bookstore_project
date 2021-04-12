@@ -23,6 +23,12 @@ class Book(models.Model):
         return reverse('book_detail', args=[str(self.id)])
 
 
+    class Meta:
+        permissions = [
+            ('special_status', "car read all books"),
+        ]
+
+
 class Review(models.Model):
     book = models.ForeignKey(
         Book,

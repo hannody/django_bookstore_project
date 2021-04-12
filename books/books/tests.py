@@ -3,55 +3,57 @@ from django.test import TestCase
 from django.urls import reverse
 from .models import Book, Review
 from django.contrib.auth import get_user_model
-class BookTest(TestCase):
-    bookTitle = "Harry Potter"
-    bookAuthor = "JK Rowling"
-    bookPrice = "25.00"
-    desiredResponseCode = 200
-    noResponse_status_code= 404
-    list_view_template = 'books/book_list.html'
-    detail_view_template = 'books/book_detail.html'
+class BookTests(TestCase):
 
-
-    def setup(self):
+    def setUp(self):
         self.user = get_user_model().objects.create_user(
             username='reviewuser',
             email='reviewuser@email.com',
             password='testpass123'
         )
-
+        self.special_permission = Permission.objects.get(
+            codename='special_status') # new
         self.book = Book.objects.create(
-            title= self.bookTitle,
-            author= self.bookAuthor,
-            price= self.bookPrice
+            title='Harry Potter',
+            author='JK Rowling',
+            price='25.00',
         )
-
         self.review = Review.objects.create(
-            book=self.book,
-            author=self.user,
-            review='An excellent review',
+            book = self.book,
+            author = self.user,
+            review = 'An excellent review',
         )
 
-    # 1- Book listing
     def test_book_listing(self):
-        self.assertEqual(f'{self.book.title}', self.bookTitle)
-        self.assertEqual(f'{self.book.author}', self.bookAuthor)
-        self.assertEqual(f'{ self.book.price}', self.bookPrice)
+        self.assertEqual(f'{self.book.title}', 'Harry Potter')
+        self.assertEqual(f'{self.book.author}', 'JK Rowling')
+        self.assertEqual(f'{self.book.price}', '25.00')
 
-    # 2- Book list view
-    def test_book_list_view(self):
+    def test_book_list_view_for_logged_in_user(self): # new
+        self.client.login(email='reviewuser@email.com', password='testpass123')
         response = self.client.get(reverse('book_list'))
-        self.assertEqual(response.status_code, self.desiredResponseCode)
-        self.assertContains(response, self.bookTitle)
-        self.assertTemplateUsed(response, template_name= self.list_view_template)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'Harry Potter')
+        self.assertTemplateUsed(response, 'books/book_list.html')
 
-    # 3- Book detail view
-    def test_book_detail_view(self):
+    def test_book_list_view_for_logged_out_user(self):  # new
+        self.client.logout()
+        response = self.client.get(reverse('book_list'))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response, '%s?next=/books/' % (reverse('account_login')))
+        response = self.client.get(
+            '%s?next=/books/' % (reverse('account_login')))
+        self.assertContains(response, 'Log In')
+
+    def test_book_detail_view_with_permissions(self): # new
+        self.client.login(email='reviewuser@email.com', password='testpass123')
+        self.user.user_permissions.add(self.special_permission)
         response = self.client.get(self.book.get_absolute_url())
         no_response = self.client.get('/books/12345/')
-        self.assertEqual(response.status_code, self.desiredResponseCode)
-        self.assertEqual(no_response.status_code, self.noResponse_status_code)
-        self.assertContains(response, self.bookTitle)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(no_response.status_code, 404)
+        self.assertContains(response, 'Harry Potter')
         self.assertContains(response, 'An excellent review')
-        self.assertTemplateUsed(response, self.detail_view_template )
+        self.assertTemplateUsed(response, 'books/book_detail.html')
 

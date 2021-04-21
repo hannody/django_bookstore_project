@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+
+from django.conf.global_settings import CSRF_COOKIE_SECURE, SESSION_COOKIE_SECURE
 from environs import Env
 
 env = Env()
@@ -25,11 +27,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = env("DJANGO_SECRET_KEY")
 
+"""
 with open('./config/secrets.key') as secret_key:
     SECRET_KEY = secret_key.read().strip()
+"""
+
+SECRET_KEY = env("DJANGO_SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DJANGO_DEBUG")
+DEBUG = env.bool("DJANGO_DEBUG", default= False)
+#CSRF_COOKIE_SECURE = True
+#SESSION_COOKIE_SECURE = True
+#SILENCED_SYSTEM_CHECKS=['security.W004']
+
+
 
 ALLOWED_HOSTS = ['.herokuapp.com', '127.0.0.1', '0.0.0.0']
 
@@ -76,7 +87,6 @@ MIDDLEWARE = [
 ACHE_MIDDLEWARE_ALIAS = 'default'
 CACHE_MIDDLEWARE_SECONDS = 604800 #(1 Week 60s X 60m X 168h)
 CACHE_MIDDLEWARE_KEY_PREFIX = ''
-
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
@@ -188,3 +198,13 @@ MEDIA_ROOT = str(BASE_DIR.joinpath('media')) # new
 import socket
 hostname, _, ips = socket.gethostbyname_ex(socket.gethostname())
 INTERNAL_IPS = [ip[:-1] + "1" for ip in ips]
+
+
+SECURE_SSL_REDIRECT = env.bool("DJANGO_SECURE_SSL_REDIRECT", default=True)
+SECURE_HSTS_SECONDS = env.int("DJANGO_SECURE_HSTS_SECONDS", default=2592000)# 1 month
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", default=True)
+SECURE_HSTS_PRELOAD = env.bool("DJANGO_SECURE_HSTS_PRELOAD", default=True)
+SESSION_COOKIE_SECURE = env.bool("DJANGO_SESSION_COOKIE_SECURE", default= True)
+CSRF_COOKIE_SECURE =env.bool("DJANGO_CSRF_COOKIE_SECURE", default= True)
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

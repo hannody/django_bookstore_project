@@ -54,11 +54,8 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Error: Site doesn't declare an explicit app_label and isn't in an application in INSTALLED_APPS.
-    # https://stackoverflow.com/questions/35388637/runtimeerror-model-class-django-contrib-sites-models-site-doesnt-declare-an-ex
-    # FIX
     'django.contrib.sites',
+
 
     # Third party
     'crispy_forms',
